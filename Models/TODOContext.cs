@@ -48,7 +48,9 @@ public partial class TODOContext : DbContext
             entity.Property(e => e.name)
                 .IsRequired()
                 .HasMaxLength(255);
-            entity.Property(e => e.password).HasMaxLength(50);
+            entity.Property(e => e.password)
+                .IsRequired()
+                .HasMaxLength(50);
             entity.Property(e => e.profilePic)
                 .IsRequired()
                 .HasMaxLength(255);

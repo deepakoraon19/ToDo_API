@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDo_API.Models;
+using ToDo_API.Services;
+using ToDo_API.Utils;
 using VM = ToDo_API.ViewModels;
 namespace ToDo_API.Controllers
 {
@@ -7,28 +9,21 @@ namespace ToDo_API.Controllers
     [Route("/user")]
     public class UserController : ControllerBase
     {
-        private readonly TODOContext ctx;
-        public UserController(TODOContext ctx) => this.ctx = ctx;
+        private UserService svc;
+        public UserController(UserService svc) => this.svc = svc;
 
         [HttpGet]
-        public IEnumerable<User> Get() => ctx.Users.ToList();
+        public IEnumerable<VM.Users> Get() => svc.Get();
+
+        [HttpDelete]
+        public Reply Delete(string id) => Helper.CreateReply(async () => await svc.Delete(id)).Result;
 
         [HttpPost]
-        public string Post([FromBody]VM.Users user)
-        {
-            try
-            {
-                user.LastUpdatedOn = DateTime.UtcNow;
-                user.DateOfBirth = DateTime.UtcNow;
+        public Reply Post([FromBody] VM.Users user) => Helper.CreateReply(async () => await svc.Add(user)).Result;
 
-                var x = ctx.Users.Add(Mapper.MapToDm(user));
-                ctx.SaveChanges();
-                return user.UserId.ToString();
-            }
-            catch (Exception e)
-            {
-                return e.Message;
-            }
-        }
+        [HttpPut]
+        public Reply Put([FromBody] VM.Users user) => Helper.CreateReply(async () => await svc.Update(user)).Result;
+
+
     }
 }
